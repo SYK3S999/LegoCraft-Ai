@@ -52,7 +52,7 @@ LegoCraftAI is an AI-powered app that combines Lego detection, classification, a
 
 
 ## Usage
-*Launch the app* on your device.
-*Capture an image* of your Lego pieces or use the live camera feed.
-*LegoCraftAI will detect and classify* the pieces.
+- *Launch the app* on your device.
+- *Capture an image* of your Lego pieces or use the live camera feed.
+- *LegoCraftAI will detect and classify* the pieces.
 *Explore shape recommendations* based on the detected Lego inventory.
