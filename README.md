@@ -23,3 +23,13 @@ LegoCraftAI is an AI-powered app that combines Lego detection, classification, a
 1. **Clone this repository**:
    ```bash
    git clone https://github.com/yourusername/LegoCraftAI.git
+
+
+## Set up the backend (Flask API)
+
+1. **Navigate to the backend directory**:
+   ```bash
+   cd path/to/backend
+2. **Install dependencies**
+  ```bash
+  pip install -r requirements.txt
