@@ -30,6 +30,29 @@ LegoCraftAI is an AI-powered app that combines Lego detection, classification, a
 1. **Navigate to the backend directory**:
    ```bash
    cd path/to/backend
-2. **Install dependencies**
-  ```bash
+2. **Install dependencies**:
+   ```bash
+   pip install -r requirements.txt
+3. **Run the Flask server**:
+   ```bash
+   python app.py
+
   pip install -r requirements.txt
+
+## Set up the frontend (Flutter app)
+
+1. **Navigate to the frontend directory**:
+   ```bash
+   cd path/to/frontend
+2. **Install Flutter:**:
+   - Follow the official installation guide
+3. **Run the app**:
+   ```bash
+   flutter run
+
+
+## Usage
+*Launch the app* on your device.
+*Capture an image* of your Lego pieces or use the live camera feed.
+*LegoCraftAI will detect and classify* the pieces.
+*Explore shape recommendations* based on the detected Lego inventory.
