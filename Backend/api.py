@@ -6,10 +6,9 @@ import cvzone
 import numpy as np
 import pandas as pd
 from collections import Counter
-import glob
 import sqlite3
 import re
-
+import json
 
 # Initialize the YOLOv8 model
 model = YOLO("D:/projects/LegoCraftAi/Backend/yolov8-object-count-in-image-main/yolov8-object-count-in-image-main/best.pt")
@@ -39,9 +38,15 @@ def object(img):
 
 def count_objects_in_image(object_classes):
     counter = Counter(object_classes)
+    sorted_counts = sorted(counter.items(), key=lambda x: (int(re.findall(r'\d+', x[0])[0]), int(re.findall(r'\d+', x[0])[1])))
+    sorted_counts_str = [str(count) for _, count in sorted_counts]
+    formatted_counts = ', '.join(sorted_counts_str)
     print("Object Count in Image:")
-    for obj, count in counter.items():
+    for obj, count in sorted_counts:
         print(f"{obj}: {count}")
+    print("Formatted counts:", formatted_counts)
+    return formatted_counts
+
 
 # Create a Flask app
 app = Flask(__name__)
@@ -79,14 +84,20 @@ def process_image():
         # Call your object detection function
         object_classes = object(img)
 
-        # Count objects in the image
-        count_objects_in_image(object_classes)
+        # Count objects in the image and format the counts
+        formatted_counts = count_objects_in_image(object_classes)
 
-        # Encode the processed image back to bytes
-        _, processed_image_data = cv2.imencode('.jpg', img)
-
-        # Return the processed image data
-        return processed_image_data.tobytes()
+        # Query the database to find a match for the formatted counts
+        conn = get_db()
+        c = conn.cursor()
+        c.execute("SELECT image_id FROM legos WHERE lego_counts = ?", (formatted_counts,))
+        result = c.fetchone()
+        if result:
+            image_id = str(result[0])
+            # Return the image ID
+            return image_id
+        else:
+            return jsonify({"error": "No matching shape found"}), 404
 
     except Exception as e:
         # Log any exceptions that occur during image processing
@@ -95,16 +106,25 @@ def process_image():
 
 @app.route("/get_image/<image_id>", methods=["GET"])
 def get_image(image_id):
-    # Get the database connection
-    conn = get_db()
-    c = conn.cursor()
+    try:
+        # Get the database connection
+        conn = get_db()
+        c = conn.cursor()
 
-    # Query the database to get the image data
-    c.execute("SELECT possible_shape FROM legos WHERE id = ?", (image_id,))
-    image_data = c.fetchone()[0]
+        # Query the database to get the possible_shape
+        c.execute("SELECT possible_shape FROM legos WHERE image_id = ?", (image_id,))
+        possible_shape_data = c.fetchone()
+        if possible_shape_data:
+            possible_shape = possible_shape_data[0]
+            # Return the possible_shape (URL)
+            return jsonify({"possible_shape": possible_shape})
+        else:
+            return jsonify({"error": "Image not found"}), 404
 
-    # Return the image data
-    return image_data
+    except Exception as e:
+        # Log any exceptions that occur
+        print("Error retrieving image data:", e)
+        return jsonify({"error": "An error occurred while retrieving image data"}), 500
 
 if __name__ == "__main__":
     # Create the lego_shapes table and insert data

@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:typed_data'; // Import needed for Uint8List
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -237,10 +238,11 @@ class _ScanPageState extends State<ScanPage> {
 
       if (response.statusCode == 200) {
         // Image processed successfully
-        final processedImageData = await response.stream.toBytes();
-        navigateToResultPage(processedImageData.toString());
+        final processedImageData = await utf8.decodeStream(response.stream);
+        print('image id is $processedImageData');
+        navigateToResultPage(processedImageData);
       } else {
-        final errorMessage = await response.stream.bytesToString();
+        final errorMessage = await utf8.decodeStream(response.stream);
         print('Error processing image: $errorMessage');
         // Handle error
       }
@@ -255,8 +257,11 @@ class _ScanPageState extends State<ScanPage> {
   }
 
   void navigateToResultPage(String imageId) {
-    // Navigate to the result page and pass the image ID
+    // Trim any whitespace from the imageId
+    String trimmedImageId = imageId.trim();
+
+    // Navigate to the result page and pass the trimmed image ID
     Navigator.of(context).push(MaterialPageRoute(
-        builder: (context) => const ResultsPage(imageId: '1')));
+        builder: (context) => ResultsPage(imageId: trimmedImageId)));
   }
 }

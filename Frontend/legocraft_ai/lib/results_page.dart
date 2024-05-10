@@ -1,4 +1,4 @@
-import 'dart:typed_data';
+import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
@@ -13,7 +13,7 @@ class ResultsPage extends StatefulWidget {
 }
 
 class _ResultsPageState extends State<ResultsPage> {
-  Uint8List? _imageData;
+  String? _imageUrl;
 
   @override
   void initState() {
@@ -26,9 +26,15 @@ class _ResultsPageState extends State<ResultsPage> {
       final response = await http.get(
           Uri.parse('http://192.168.136.162:5000/get_image/${widget.imageId}'));
       if (response.statusCode == 200) {
-        setState(() {
-          _imageData = response.bodyBytes;
-        });
+        final responseData = json.decode(response.body);
+        if (responseData.containsKey('possible_shape')) {
+          final imageUrl = responseData["possible_shape"];
+          setState(() {
+            _imageUrl = imageUrl;
+          });
+        } else {
+          print('Image URL not found in response');
+        }
       } else {
         print('Failed to fetch image data');
       }
@@ -44,10 +50,16 @@ class _ResultsPageState extends State<ResultsPage> {
         title: Text('Results Page'),
       ),
       body: Center(
-        child: _imageData != null
-            ? Image.memory(
-                _imageData!, // Display image from memory
-                fit: BoxFit.cover, // Adjust image to fit the screen
+        child: _imageUrl != null
+            ? Column(
+                children: [
+                  Image.network(
+                    _imageUrl!, // Display image from URL
+                    fit: BoxFit.cover, // Adjust image to fit the screen
+                  ),
+                  SizedBox(height: 20),
+                  Text(_imageUrl!)
+                ],
               )
             : CircularProgressIndicator(),
       ),
