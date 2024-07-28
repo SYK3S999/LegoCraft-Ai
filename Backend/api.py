@@ -39,10 +39,15 @@ def object(img):
 def count_objects_in_image(object_classes):
     counter = Counter(object_classes)
     sorted_counts = sorted(counter.items(), key=lambda x: (int(re.findall(r'\d+', x[0])[0]), int(re.findall(r'\d+', x[0])[1])))
-    sorted_counts_str = [str(count) for _, count in sorted_counts]
-    formatted_counts = ', '.join(sorted_counts_str)
+    filtered_counts = [(obj, count) for obj, count in sorted_counts if count > 0]
+    if len(filtered_counts) == 1:
+        # If there is only one non-zero count, return it without zeros
+        formatted_counts = str(filtered_counts[0][1])
+    else:
+        sorted_counts_str = [str(count) for _, count in filtered_counts]
+        formatted_counts = ', '.join(sorted_counts_str)
     print("Object Count in Image:")
-    for obj, count in sorted_counts:
+    for obj, count in filtered_counts:
         print(f"{obj}: {count}")
     print("Formatted counts:", formatted_counts)
     return formatted_counts
@@ -70,11 +75,6 @@ def process_image():
         # Get the image file from the request
         image_file = request.files["image"]
 
-        # Log information about the received image
-        print("Received image:", image_file.filename)
-        print("Content type:", image_file.content_type)
-        print("File size:", image_file.content_length)
-
         # Read the image data from the file object
         image_data = image_file.read()
 
@@ -86,21 +86,42 @@ def process_image():
 
         # Count objects in the image and format the counts
         formatted_counts = count_objects_in_image(object_classes)
+        if not formatted_counts:
+            return jsonify({"error": "All objects have a count of zero"}), 404
+
+        # Convert formatted_counts to a list of integers
+        formatted_counts_list = [int(count) for count in formatted_counts.split(', ')]
 
         # Query the database to find a match for the formatted counts
         conn = get_db()
         c = conn.cursor()
-        c.execute("SELECT image_id FROM legos WHERE lego_counts = ?", (formatted_counts,))
+
+        # Check for an exact match
+        c.execute("SELECT image_id, lego_counts FROM legos WHERE lego_counts = ?", (formatted_counts,))
         result = c.fetchone()
         if result:
-            image_id = str(result[0])
-            # Return the image ID
-            return image_id
+            image_id, _ = result
+            return str(image_id)
+
+        # If no exact match, find the closest match
+        c.execute("SELECT image_id, lego_counts FROM legos")
+        results = c.fetchall()
+        closest_match = None
+        min_diff = float('inf')
+        for image_id, lego_counts in results:
+            lego_counts_list = [int(count) for count in lego_counts.split(', ')]
+            if all(lego_count <= formatted_count for lego_count, formatted_count in zip(lego_counts_list, formatted_counts_list)):
+                diff = sum(formatted_count - lego_count for formatted_count, lego_count in zip(formatted_counts_list, lego_counts_list))
+                if diff < min_diff:
+                    min_diff = diff
+                    closest_match = image_id
+
+        if closest_match:
+            return str(closest_match)
         else:
             return jsonify({"error": "No matching shape found"}), 404
 
     except Exception as e:
-        # Log any exceptions that occur during image processing
         print("Error processing image:", e)
         return jsonify({"error": "An error occurred while processing the image"}), 500
 

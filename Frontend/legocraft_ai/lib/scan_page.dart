@@ -9,9 +9,10 @@ import 'package:http_parser/http_parser.dart';
 import 'results_page.dart';
 
 class ScanPage extends StatefulWidget {
-  const ScanPage({Key? key}) : super(key: key);
+  const ScanPage({super.key});
 
   @override
+  // ignore: library_private_types_in_public_api
   _ScanPageState createState() => _ScanPageState();
 }
 
@@ -22,9 +23,7 @@ class _ScanPageState extends State<ScanPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Image Processing'),
-      ),
+      appBar: AppBar(),
       body: SingleChildScrollView(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.center,
@@ -34,7 +33,7 @@ class _ScanPageState extends State<ScanPage> {
                     children: [
                       const SizedBox(height: 10),
                       Image.asset(
-                        'assets/image 3 (1).png',
+                        'assets/untitled8.png',
                         height: 450,
                         width: double.infinity,
                       ),
@@ -46,7 +45,6 @@ class _ScanPageState extends State<ScanPage> {
                     height: 450,
                     width: double.infinity,
                   ),
-            const SizedBox(height: 16),
             _imageData == null
                 ? Column(
                     mainAxisAlignment: MainAxisAlignment.center,
@@ -224,27 +222,81 @@ class _ScanPageState extends State<ScanPage> {
     });
 
     try {
-      final url = Uri.parse('http://192.168.136.162:5000/process_image');
+      final url = Uri.parse('http://172.20.10.3:5000/process_image');
       final request = http.MultipartRequest('POST', url);
       final file = http.MultipartFile.fromBytes(
         'image',
         _imageData!,
-        filename: 'image.jpg', // Provide a filename
-        contentType:
-            MediaType('image', 'jpeg'), // Specify the correct content type
+        filename: 'image.jpg',
+        contentType: MediaType('image', 'jpeg'),
       );
       request.files.add(file);
       final response = await request.send();
-
+ 
       if (response.statusCode == 200) {
         // Image processed successfully
         final processedImageData = await utf8.decodeStream(response.stream);
-        print('image id is $processedImageData');
         navigateToResultPage(processedImageData);
-      } else {
-        final errorMessage = await utf8.decodeStream(response.stream);
-        print('Error processing image: $errorMessage');
-        // Handle error
+      } else if (response.statusCode == 404) {
+        // Show dialog for 404 response
+        showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              title: Text(
+                'Sorry!',
+                style: TextStyle(
+                  color: const Color(0xFFFDB813),
+                  fontFamily: GoogleFonts.dmSans().fontFamily,
+                  fontSize: 18,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+              content: const Text(
+                  "There's no shape you can build with those bricks, please try other ones."),
+              actions: [
+                TextButton(
+                    onPressed: () => Navigator.of(context).pop(),
+                    child: Text(
+                      'OK',
+                      style: TextStyle(
+                        color: const Color(0xFFFDB813),
+                        fontFamily: GoogleFonts.dmSans().fontFamily,
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    )),
+              ],
+            );
+          },
+        );
+      } else if (response.statusCode == 500) {
+        AlertDialog(
+          title: Text(
+            'Sorry!',
+            style: TextStyle(
+              color: const Color(0xFFFDB813),
+              fontFamily: GoogleFonts.dmSans().fontFamily,
+              fontSize: 18,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+          content: const Text("please take a valid picture with lego bricks"),
+          actions: [
+            TextButton(
+                onPressed: () => Navigator.of(context).pop(),
+                child: Text(
+                  'OK',
+                  style: TextStyle(
+                    color: const Color(0xFFFDB813),
+                    fontFamily: GoogleFonts.dmSans().fontFamily,
+                    fontSize: 16,
+                    fontWeight: FontWeight.w600,
+                  ),
+                )),
+          ],
+        );
+        // Handle other error cases
       }
     } catch (e) {
       // Handle exception

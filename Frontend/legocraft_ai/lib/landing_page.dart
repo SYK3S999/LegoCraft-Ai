@@ -16,51 +16,20 @@ class _LandingPageState extends State<LandingPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: PreferredSize(
-        preferredSize: const Size.fromHeight(60.0),
-        child: Container(
-          decoration: BoxDecoration(
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withOpacity(0.05),
-                spreadRadius: 2,
-                blurRadius: 4,
-                offset: const Offset(0, 2),
-              ),
-            ],
-          ),
-          child: AppBar(
-            backgroundColor: Colors.white,
-            centerTitle: true,
-            title: RichText(
-              text: TextSpan(
-                style:
-                    const TextStyle(fontSize: 24, fontWeight: FontWeight.w600),
-                children: <TextSpan>[
-                  TextSpan(
-                    text: 'Lego',
-                    style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        color: const Color(0XFF0FCCCE),
-                        fontFamily: GoogleFonts.poppins().fontFamily),
-                  ),
-                  TextSpan(
-                    text: 'Craft',
-                    style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        color: const Color(0xFFFDB813),
-                        fontFamily: GoogleFonts.poppins().fontFamily),
-                  ),
-                  TextSpan(
-                    text: 'Ai',
-                    style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        color: const Color(0xFFC41E3A),
-                        fontFamily: GoogleFonts.poppins().fontFamily),
-                  ),
-                ],
-              ),
-            ),
-          ),
+        preferredSize: const Size.fromHeight(20.0),
+        // child: Container(
+        //   // decoration: BoxDecoration(
+        //   //   boxShadow: [
+        //   //     BoxShadow(
+        //   //       color: Colors.black.withOpacity(0.05),
+        //   //       spreadRadius: 2,
+        //   //       blurRadius: 4,
+        //   //       offset: const Offset(0, 2),
+        //   //     ),
+        //   //   ],
+        //   // ),
+        child: AppBar(
+          centerTitle: true,
         ),
       ),
       body: SingleChildScrollView(
@@ -74,25 +43,56 @@ class _LandingPageState extends State<LandingPage> {
                 height: 350,
                 fit: BoxFit.cover,
               ),
+              RichText(
+                text: TextSpan(
+                  style: const TextStyle(
+                      fontSize: 28, fontWeight: FontWeight.w600),
+                  children: <TextSpan>[
+                    TextSpan(
+                      text: 'Lego',
+                      style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          color: const Color(0XFF0FCCCE),
+                          fontFamily: GoogleFonts.dmSans().fontFamily),
+                    ),
+                    TextSpan(
+                      text: 'Craft',
+                      style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          color: const Color(0xFFFDB813),
+                          fontFamily: GoogleFonts.dmSans().fontFamily),
+                    ),
+                    TextSpan(
+                      text: 'Ai',
+                      style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          color: const Color(0xFFC41E3A),
+                          fontFamily: GoogleFonts.dmSans().fontFamily),
+                    ),
+                  ],
+                ),
+              ),
               Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 20),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
                 child: RichText(
+                  textAlign: TextAlign.center,
                   text: TextSpan(
                     style: TextStyle(
-                      fontFamily: GoogleFonts.poppins().fontFamily,
-                      fontSize: 24,
+                      fontFamily: GoogleFonts.dmSans().fontFamily,
+                      fontSize: 12,
                       fontWeight: FontWeight.w600,
-                      letterSpacing: 2,
+                      letterSpacing: 1,
                       height: 1.3,
                     ),
                     children: <TextSpan>[
                       TextSpan(
                         text:
-                            'Create Lego wonders effortlessly with your child',
+                            'upload a picture of your legos and Create wonder builds effortlessly with your child',
                         style: TextStyle(
-                          fontFamily: GoogleFonts.poppins().fontFamily,
+                          fontFamily: GoogleFonts.dmSans().fontFamily,
                           fontWeight: FontWeight.bold,
-                          color: Colors.black,
+                          color: const Color.fromRGBO(102, 102, 102, 1),
                         ),
                       ),
                     ],
@@ -114,7 +114,7 @@ class _LandingPageState extends State<LandingPage> {
                     );
                   },
                   style: ElevatedButton.styleFrom(
-                    fixedSize: const Size(700, 50),
+                    fixedSize: const Size(297, 43),
                     shape: const RoundedRectangleBorder(
                       borderRadius: BorderRadius.all(Radius.circular(15)),
                     ),
@@ -124,8 +124,8 @@ class _LandingPageState extends State<LandingPage> {
                     "Let's Get Started !",
                     style: TextStyle(
                       color: Colors.white,
-                      fontFamily: GoogleFonts.poppins().fontFamily,
-                      fontSize: 22,
+                      fontFamily: GoogleFonts.dmSans().fontFamily,
+                      fontSize: 18,
                       fontWeight: FontWeight.w600,
                     ),
                   ),
